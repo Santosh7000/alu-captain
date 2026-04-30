@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Proof | PropertyHub</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        html { scroll-behavior: smooth; }
+
+        /* ── IMPROVED NAVBAR ── */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            height: var(--nav-height);
+            background: rgba(11, 13, 23, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        nav.scrolled {
+            background: rgba(11, 13, 23, 0.98);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+        }
+
+        .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+            transition: 0.3s;
+            padding: 6px 0;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0;
+            width: 0; height: 2px;
+            background: var(--primary-gold);
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover::after,
+        .nav-links a.active::after { width: 100%; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary-gold); }
+
+        /* Cart & Favourites Buttons in Nav */
+        .nav-actions { display: flex; gap: 10px; align-items: center; }
+
+        .nav-icon-btn {
+            position: relative;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-dim);
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+        .nav-icon-btn:hover {
+            border-color: var(--primary-gold);
+            color: var(--primary-gold);
+            background: rgba(197,160,89,0.08);
+        }
+        .nav-badge {
+            position: absolute;
+            top: -6px; right: -6px;
+            background: var(--primary-gold);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: bold;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0;
+            transform: scale(0);
+            transition: 0.2s ease;
+        }
+        .nav-badge.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ── SLIDE-OUT PANELS ── */
+        .side-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .side-panel-overlay.open { opacity: 1; pointer-events: all; }
+
+        .side-panel {
+            position: fixed; right: -400px; top: 0; height: 100vh;
+            width: 400px; background: var(--glass-bg);
+            border-left: 1px solid var(--glass-border);
+            z-index: 2001; transition: right 0.3s ease;
+            display: flex; flex-direction: column;
+        }
+        .side-panel.open { right: 0; }
+        .side-panel-header {
+            padding: 25px 28px; border-bottom: 1px solid var(--glass-border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .side-panel-header h3 { color: var(--primary-gold); font-size: 1.1rem; letter-spacing: 0.5px; }
+        .close-panel {
+            background: none; border: none; color: var(--text-dim);
+            font-size: 1.3rem; cursor: pointer; transition: 0.2s;
+        }
+        .close-panel:hover { color: #fff; }
+
+        .side-panel-body { flex: 1; overflow-y: auto; padding: 20px 28px; }
+        .side-panel-body::-webkit-scrollbar { width: 4px; }
+        .side-panel-body::-webkit-scrollbar-track { background: transparent; }
+        .side-panel-body::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+        .panel-empty {
+            text-align: center; padding: 40px 20px; color: var(--text-dim);
+        }
+        .panel-empty i { font-size: 3rem; color: rgba(197,160,89,0.2); display: block; margin-bottom: 15px; }
+
+        .panel-item {
+            display: flex; gap: 12px; align-items: center;
+            padding: 12px; margin-bottom: 10px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px; transition: 0.2s;
+        }
+        .panel-item:hover { border-color: var(--primary-gold); }
+        .panel-item-img {
+            width: 50px; height: 50px;
+            background: var(--glass-bg); border-radius: 8px; flex-shrink: 0;
+        }
+        .panel-item-info { flex: 1; min-width: 0; }
+        .panel-item-info h4 { font-size: 0.88rem; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .panel-item-info span { font-size: 0.8rem; color: var(--primary-gold); font-weight: bold; }
+        .panel-item-remove {
+            background: none; border: none; color: var(--text-dim);
+            cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
+        .panel-item-remove:hover { color: #ff6b6b; }
+
+        .side-panel-footer {
+            padding: 20px 28px; border-top: 1px solid var(--glass-border);
+        }
+        .panel-total {
+            display: flex; justify-content: space-between; margin-bottom: 15px;
+        }
+        .panel-total strong { color: var(--primary-gold); font-size: 1rem; }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            padding: 15px 25px; border-radius: 10px; color: #fff;
+            z-index: 3000; opacity: 0; transition: 0.3s; white-space: nowrap;
+        }
+        .toast i { color: var(--primary-gold); }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .testimonial-header { text-align: center; padding: 120px 0 60px; }
+        .reviews-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        .testimonial-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            border-radius: 24px;
+            position: relative;
+            transition: var(--transition);
+        }
+        .testimonial-card:hover {
+            border-color: var(--primary-gold);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .quote-icon {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+            opacity: 0.2;
+        }
+        .tag {
+            background: rgba(197, 160, 89, 0.1);
+            color: var(--primary-gold);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .user-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 20px;
+        }
+        .avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-gold);
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toast-msg">Added!</span></div>
+
+    <!-- SIDE PANEL: FAVOURITES -->
+    <div class="side-panel-overlay" id="fav-overlay" onclick="closeFavPanel()"></div>
+    <div class="side-panel" id="fav-panel">
+        <div class="side-panel-header">
+            <h3><i class="fas fa-heart" style="margin-right:8px;"></i> Saved Favourites</h3>
+            <button class="close-panel" onclick="closeFavPanel()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="side-panel-body" id="fav-body">
+            <div class="panel-empty" id="fav-empty">
+                <i class="fas fa-heart-crack"></i>
+                <p>No favourites yet.</p>
+                <small>Tap the ♡ on any listing to save it here.</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDE PANEL: CART -->
+    <div class="side-panel-overlay" id="cart-overlay" onclick="closeCartPanel()"></div>
+    <div class="side-panel" id="cart-panel">
+        <div class="side-panel-header">
+            <h3><i class="fas fa-shopping-bag" style="margin-right:8px;"></i> Your Cart</h3>
+            <button class="close-panel" onclick="closeCartPanel()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="side-panel-body" id="cart-body">
+            <div class="panel-empty" id="cart-empty">
+                <i class="fas fa-bag-shopping"></i>
+                <p>Your cart is empty.</p>
+                <small>Add a property to schedule a viewing or inquiry.</small>
+            </div>
+        </div>
+        <div class="side-panel-footer" id="cart-footer" style="display:none;">
+            <div class="panel-total">
+                <span>Properties Selected</span>
+                <strong id="cart-count-label">0</strong>
+            </div>
+            <button class="btn-gold" style="width:100%; padding:16px; font-size:0.9rem;">
+                <i class="fas fa-calendar-check"></i> &nbsp;Request Viewing for All
+            </button>
+        </div>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- ── IMPROVED NAVBAR ── -->
+        <nav id="mainNav">
+            <a href="index.html" class="logo">
+                <i class="fas fa-house-chimney-window" style="color: var(--primary-gold);"></i> PropertyHub
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="feature.html">Features</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="testimonial.html" class="active">Testimonials</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="listing.html">Market</a></li>
+            </ul>
+            <div class="nav-actions">
+                <!-- Favourites button -->
+                <button class="nav-icon-btn" onclick="openFavPanel()" title="Saved Favourites">
+                    <i class="fas fa-heart"></i>
+                    <span class="nav-badge" id="fav-badge">0</span>
+                </button>
+                <!-- Cart button -->
+                <button class="nav-icon-btn" onclick="openCartPanel()" title="Cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="nav-badge" id="cart-badge">0</span>
+                </button>
+                <a href="listing.html#sell-section" class="btn-gold" style="text-decoration:none; padding: 0.6rem 1.4rem;">List Property</a>
+            </div>
+        </nav>
+
+        <main class="container animate">
+            <div class="testimonial-header">
+                <h1 style="font-size: 3rem;">Trusted by 38,000+</h1>
+                <p style="color: var(--text-dim); margin-top: 10px;">The voices of our community define our success[cite: 7].</p>
+            </div>
+
+            <div class="reviews-container">
+                <!-- Card 1 -->
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-right quote-icon"></i>
+                    <span class="tag">Luxury Buyer</span>
+                    <p style="margin-top: 20px; line-height: 1.7;">"The virtual tours are a game changer. I bought my villa in Kathmandu while still in Sydney. The blockchain escrow gave me total peace of mind."[cite: 7]</p>
+                    <div class="user-meta">
+                        <div class="avatar" style="background-image: url('https://i.pravatar.cc/150?u=a');"></div>
+                        <div>
+                            <h4 style="color: #fff;">Marcus Sterling</h4>
+                            <small style="color: var(--primary-gold);">Verified Homeowner[cite: 7]</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-right quote-icon"></i>
+                    <span class="tag">Smart Renter</span>
+                    <p style="margin-top: 20px; line-height: 1.7;">"No middleman, no hidden fees. The in-app chat allowed me to negotiate directly with the owner. Fully transparent process!"[cite: 7]</p>
+                    <div class="user-meta">
+                        <div class="avatar" style="background-image: url('https://i.pravatar.cc/150?u=b');"></div>
+                        <div>
+                            <h4 style="color: #fff;">James Wu</h4>
+                            <small style="color: var(--primary-gold);">Verified Renter[cite: 7]</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="op">
+            <p>© 2026 <span>PropertyHub</span> Kathmandu. Developed by Nishan, Bigyan, Santosh, Dipshan and Nibesh.</p>
+        </footer>
+    </div>
+
+    <script>
+        // ── NAV SCROLL EFFECT ──
+        window.addEventListener('scroll', () => {
+            document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        // ── TOAST ──
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2600);
+        }
+
+        // ── CART STATE ──
+        let cart = [];
+        let favs = [];
+
+        function updateBadge(id, count) {
+            const badge = document.getElementById(id);
+            badge.textContent = count;
+            badge.classList.toggle('visible', count > 0);
+        }
+
+        function renderCart() {
+            const body = document.getElementById('cart-body');
+            const footer = document.getElementById('cart-footer');
+            const empty = document.getElementById('cart-empty');
+            body.querySelectorAll('.panel-item').forEach(el => el.remove());
+            if (cart.length === 0) {
+                empty.style.display = '';
+                footer.style.display = 'none';
+            } else {
+                empty.style.display = 'none';
+                footer.style.display = '';
+                cart.forEach((item, i) => {
+                    const el = document.createElement('div');
+                    el.className = 'panel-item';
+                    el.innerHTML = `
+                        <div class="panel-item-img"></div>
+                        <div class="panel-item-info">
+                            <h4>${item.name}</h4>
+                            <span>${item.price}</span>
+                        </div>
+                        <button class="panel-item-remove" onclick="removeFromCart(${i}, this)" title="Remove">\n                            <i class="fas fa-trash-can"></i>\n                        </button>`;\n                    body.appendChild(el);\n                });\n                document.getElementById('cart-count-label').textContent = cart.length + ' propert' + (cart.length === 1 ? 'y' : 'ies');\n            }\n            updateBadge('cart-badge', cart.length);\n        }\n\n        function renderFavs() {\n            const body = document.getElementById('fav-body');\n            const empty = document.getElementById('fav-empty');\n            body.querySelectorAll('.panel-item').forEach(el => el.remove());\n            if (favs.length === 0) {\n                empty.style.display = '';\n            } else {\n                empty.style.display = 'none';\n                favs.forEach((item, i) => {\n                    const el = document.createElement('div');\n                    el.className = 'panel-item';\n                    el.innerHTML = `\n                        <div class="panel-item-img"></div>\n                        <div class="panel-item-info">\n                            <h4>${item.name}</h4>\n                            <span>${item.price}</span>\n                        </div>\n                        <button class="panel-item-remove" onclick="removeFromFav(${i})" title="Remove">\n                            <i class="fas fa-trash-can"></i>\n                        </button>`;\n                    body.appendChild(el);\n                });\n            }\n            updateBadge('fav-badge', favs.length);\n        }\n\n        function addToCart(btn, name, price) {\n            const alreadyIn = cart.find(c => c.name === name);\n            if (alreadyIn) {\n                showToast('Already in cart');\n                return;\n            }\n            cart.push({ name, price });\n            btn.innerHTML = '<i class="fas fa-check"></i> In Cart';\n            btn.classList.add('in-cart');\n            renderCart();\n            showToast(name + ' added to cart');\n        }\n\n        function removeFromCart(i, btn) {\n            const name = cart[i].name;\n            cart.splice(i, 1);\n            renderCart();\n            document.querySelectorAll('.btn-cart').forEach(b => {\n                if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(name)) {\n                    b.innerHTML = '<i class="fas fa-shopping-bag"></i> Add to Cart';\n                    b.classList.remove('in-cart');\n                }\n            });\n        }\n\n        function toggleFav(btn, name, price) {\n            const idx = favs.findIndex(f => f.name === name);\n            if (idx > -1) {\n                favs.splice(idx, 1);\n                btn.classList.remove('active');\n                showToast('Removed from favourites');\n            } else {\n                favs.push({ name, price });\n                btn.classList.add('active');\n                showToast('❤️ Saved to favourites');\n            }\n            renderFavs();\n        }\n\n        function removeFromFav(i) {\n            const name = favs[i].name;\n            favs.splice(i, 1);\n            renderFavs();\n            document.querySelectorAll('.btn-fav').forEach(b => {\n                if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(name)) {\n                    b.classList.remove('active');\n                }\n            });\n        }\n\n        function openCartPanel() {\n            document.getElementById('cart-panel').classList.add('open');\n            document.getElementById('cart-overlay').classList.add('open');\n            document.body.style.overflow = 'hidden';\n        }\n        function closeCartPanel() {\n            document.getElementById('cart-panel').classList.remove('open');\n            document.getElementById('cart-overlay').classList.remove('open');\n            document.body.style.overflow = '';\n        }\n        function openFavPanel() {\n            document.getElementById('fav-panel').classList.add('open');\n            document.getElementById('fav-overlay').classList.add('open');\n            document.body.style.overflow = 'hidden';\n        }\n        function closeFavPanel() {\n            document.getElementById('fav-panel').classList.remove('open');\n            document.getElementById('fav-overlay').classList.remove('open');\n            document.body.style.overflow = '';\n        }\n    </script>\n</body>\n</html>
