@@ -7,7 +7,20 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* ── IMPROVED NAVBAR (from listing.html) ── */
+        /* ── CSS VARIABLES (fallback if style.css not loaded) ── */
+        :root {
+            --nav-height: 70px;
+            --primary-gold: #c5a059;
+            --glass-bg: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.08);
+            --text-dim: rgba(255,255,255,0.55);
+            --transition: all 0.3s ease;
+        }
+
+        /* ── RESET ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── IMPROVED NAVBAR ── */
         nav {
             display: flex;
             justify-content: space-between;
@@ -28,7 +41,12 @@
             background: rgba(11, 13, 23, 0.98);
             box-shadow: 0 4px 30px rgba(0,0,0,0.4);
         }
-        .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
         .nav-links a {
             text-decoration: none;
             color: var(--text-dim);
@@ -50,7 +68,7 @@
         .nav-links a.active::after { width: 100%; }
         .nav-links a:hover, .nav-links a.active { color: var(--primary-gold); }
 
-        /* Cart & Favourites Buttons in Nav */
+        /* ── NAV ACTIONS ── */
         .nav-actions { display: flex; gap: 10px; align-items: center; }
         .nav-icon-btn {
             position: relative;
@@ -63,6 +81,7 @@
             cursor: pointer;
             transition: 0.3s;
             font-size: 0.95rem;
+            flex-shrink: 0;
         }
         .nav-icon-btn:hover {
             border-color: var(--primary-gold);
@@ -85,6 +104,26 @@
         }
         .nav-badge.visible { opacity: 1; transform: scale(1); }
 
+        /* ── HAMBURGER ── */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px;
+            z-index: 1001;
+        }
+        .hamburger span {
+            display: block;
+            width: 24px; height: 2px;
+            background: var(--text-dim);
+            border-radius: 2px;
+            transition: 0.3s ease;
+        }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); background: var(--primary-gold); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); background: var(--primary-gold); }
+
         /* ── SLIDE-OUT PANELS ── */
         .side-panel-overlay {
             position: fixed; inset: 0;
@@ -97,7 +136,8 @@
         .side-panel {
             position: fixed;
             top: 0; right: -420px;
-            width: 400px; height: 100vh;
+            width: min(400px, 100vw);
+            height: 100vh;
             background: #10121e;
             border-left: 1px solid var(--glass-border);
             z-index: 2001;
@@ -153,12 +193,58 @@
         }
         .panel-total strong { color: var(--primary-gold); font-size: 1rem; }
 
+        /* ── HERO SECTION ── */
         .hero-section {
             display: flex;
             align-items: center;
             min-height: 85vh;
             gap: 50px;
             padding-bottom: 60px;
+            padding-top: calc(var(--nav-height) + 40px);
+        }
+        .hero-text { flex: 1.2; }
+        .hero-image {
+            flex: 0.8;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+        }
+        .hero-image-inner {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 100%;
+        }
+        .hero-image img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 50px rgba(197, 160, 89, 0.15));
+            position: relative;
+            z-index: 2;
+        }
+        .gold-bar {
+            width: 60px;
+            height: 3px;
+            background: var(--primary-gold);
+            margin-bottom: 20px;
+        }
+        .hero-headline {
+            margin-bottom: 2rem;
+            line-height: 1.15;
+        }
+        .hero-desc {
+            color: var(--text-dim);
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .hero-cta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
         }
         .trust-badges {
             display: flex;
@@ -168,6 +254,7 @@
             background: rgba(197, 160, 89, 0.05);
             border-radius: 15px;
             border: 1px solid var(--glass-border);
+            flex-wrap: wrap;
         }
         .badge {
             display: flex;
@@ -178,9 +265,10 @@
         }
         .badge i { color: var(--primary-gold); }
 
+        /* ── SERVICES ── */
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             margin-top: 80px;
         }
@@ -200,6 +288,92 @@
             color: var(--primary-gold);
             margin-bottom: 20px;
         }
+
+        /* ── RESPONSIVE: TABLET (≤ 900px) ── */
+        @media (max-width: 900px) {
+            .hero-section {
+                flex-direction: column;
+                min-height: auto;
+                gap: 40px;
+                padding-top: calc(var(--nav-height) + 30px);
+                padding-bottom: 40px;
+                text-align: center;
+            }
+            .hero-text { flex: none; width: 100%; }
+            .hero-image { flex: none; width: 100%; max-width: 480px; margin: 0 auto; }
+            .gold-bar { margin-left: auto; margin-right: auto; }
+            .hero-cta { justify-content: center; }
+            .trust-badges { justify-content: center; gap: 20px; }
+
+            .nav-links {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                background: rgba(11, 13, 23, 0.98);
+                backdrop-filter: blur(20px);
+                padding: 20px 0 30px;
+                gap: 0;
+                border-bottom: 1px solid var(--glass-border);
+                transform: translateY(-110%);
+                opacity: 0;
+                pointer-events: none;
+                transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+            }
+            .nav-links.mobile-active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: all;
+            }
+            .nav-links li { width: 100%; }
+            .nav-links a {
+                display: block;
+                padding: 14px 5%;
+                font-size: 1rem;
+                border-bottom: 1px solid var(--glass-border);
+            }
+            .nav-links a::after { display: none; }
+            .nav-links li:last-child a { border-bottom: none; }
+
+            .hamburger { display: flex; }
+            .btn-gold-nav-label { display: none; }
+        }
+
+        /* ── RESPONSIVE: MOBILE (≤ 600px) ── */
+        @media (max-width: 600px) {
+            nav { padding: 0 4%; }
+            .nav-actions .btn-gold { display: none; }
+
+            .hero-section {
+                padding-top: calc(var(--nav-height) + 20px);
+                gap: 30px;
+            }
+            .hero-desc { font-size: 1rem; }
+            .hero-cta { flex-direction: column; gap: 12px; }
+            .hero-cta a { width: 100%; text-align: center; }
+
+            .trust-badges {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+            .badge { font-size: 0.82rem; }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                margin-top: 50px;
+            }
+            .service-card { padding: 25px; }
+
+            .side-panel { width: 100vw; }
+        }
+
+        /* ── RESPONSIVE: SMALL MOBILE (≤ 380px) ── */
+        @media (max-width: 380px) {
+            .hero-image { max-width: 100%; }
+            .nav-icon-btn { width: 36px; height: 36px; font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>
@@ -208,7 +382,7 @@
             <a href="index.html" class="logo">
                 <i class="fas fa-house-chimney-window" style="color: var(--primary-gold);"></i> PropertyHub
             </a>
-            <ul class="nav-links">
+            <ul class="nav-links" id="navLinks">
                 <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
                 <li><a href="about.html">About</a></li>
@@ -226,6 +400,11 @@
                     <span class="nav-badge" id="cart-badge">0</span>
                 </button>
                 <a href="listing.html" class="btn-gold" style="text-decoration:none; padding: 0.6rem 1.4rem;">Get Started</a>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Toggle menu" role="button" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </nav>
 
@@ -270,17 +449,16 @@
         <main class="container">
             <!-- Hero Section -->
             <section class="hero-section animate">
-                <div style="flex: 1.2;">
-                    <div style="width: 60px; height: 3px; background: var(--primary-gold); margin-bottom: 20px;"></div>
-                    <h1>Luxury Living <br><span style="color: #fff;">Defined by Trust.</span></h1>
-                    <p style="color: var(--text-dim); margin-bottom: 2.5rem; font-size: 1.1rem; line-height: 1.8;">
+                <div class="hero-text">
+                    <div class="gold-bar"></div>
+                    <h1 class="hero-headline">Luxury Living <br><span style="color: #fff;">Defined by Trust.</span></h1>
+                    <p class="hero-desc">
                         Experience the next generation of real estate. From blockchain-secured contracts to AI-driven market insights, we provide a seamless path to your dream home.
                     </p>
-                    <div style="display: flex; gap: 20px;">
-                        <a class="btn-gold lion" style="padding: 1.2rem 2.5rem; " href="feature.html">Explore Properties</a>
-                        <a class="btn-outline" style="padding: 1.2rem 2.5rem; " href="about.html">Learn More</a>
+                    <div class="hero-cta">
+                        <a class="btn-gold lion" style="padding: 1.2rem 2.5rem;" href="feature.html">Explore Properties</a>
+                        <a class="btn-outline" style="padding: 1.2rem 2.5rem;" href="about.html">Learn More</a>
                     </div>
-
                     <div class="trust-badges">
                         <div class="badge"><i class="fas fa-shield-halved"></i> 100% Secure Escrow</div>
                         <div class="badge"><i class="fas fa-certificate"></i> Verified Listings</div>
@@ -288,12 +466,9 @@
                     </div>
                 </div>
 
-                <div style="flex: 0.8; text-align: right;">
-                    <div style="position: relative; display: inline-block;">
-                        <!-- Main home page image -->
-                        <img src="mogged.png" style="width: 100%; filter: drop-shadow(0 0 50px rgba(197, 160, 89, 0.15)); position: relative; z-index: 2;" alt="Modern Property Hub Preview">
-                        <!-- Decorative element -->
-                       
+                <div class="hero-image">
+                    <div class="hero-image-inner">
+                        <img src="mogged.png" alt="Modern Property Hub Preview" loading="lazy">
                     </div>
                 </div>
             </section>
@@ -303,29 +478,60 @@
                 <div class="service-card">
                     <i class="fas fa-magnifying-glass-chart"></i>
                     <h3>Smart Search</h3>
-                    <p style="color: var(--text-dim); margin-top: 15px;">Use our AI filters to find homes based on lifestyle, proximity to schools, and future value[cite: 4, 5].</p>
+                    <p style="color: var(--text-dim); margin-top: 15px;">Use our AI filters to find homes based on lifestyle, proximity to schools, and future value.</p>
                 </div>
                 <div class="service-card">
                     <i class="fas fa-fingerprint"></i>
                     <h3>Verified Security</h3>
-                    <p style="color: var(--text-dim); margin-top: 15px;">Identity verification is built into our core, ensuring you only deal with legitimate buyers and sellers[cite: 1, 5].</p>
+                    <p style="color: var(--text-dim); margin-top: 15px;">Identity verification is built into our core, ensuring you only deal with legitimate buyers and sellers.</p>
                 </div>
                 <div class="service-card">
                     <i class="fas fa-file-signature"></i>
                     <h3>Digital Closing</h3>
-                    <p style="color: var(--text-dim); margin-top: 15px;">Sign legal documents and complete transactions in minutes with our blockchain-backed agreement system[cite: 1, 5].</p>
+                    <p style="color: var(--text-dim); margin-top: 15px;">Sign legal documents and complete transactions in minutes with our blockchain-backed agreement system.</p>
                 </div>
             </section>
         </main>
 
         <footer class="op">
-            <p> 2026 <span>PropertyHub</span> Kathmandu. Developed by Nishan, Bigyan, Santosh, Dipshan and Nibesh.</p>
+            <p>2026 <span>PropertyHub</span> Kathmandu. Developed by Nishan, Bigyan, Santosh, Dipshan and Nibesh.</p>
         </footer>
     </div>
+
     <script>
         // ── NAV SCROLL EFFECT ──
         window.addEventListener('scroll', () => {
             document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        // ── HAMBURGER MENU TOGGLE ──
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        function toggleMenu() {
+            hamburger.classList.toggle('open');
+            navLinks.classList.toggle('mobile-active');
+        }
+
+        hamburger.addEventListener('click', toggleMenu);
+        hamburger.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMenu(); }
+        });
+
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('open');
+                navLinks.classList.remove('mobile-active');
+            });
+        });
+
+        // Close menu on outside click
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                hamburger.classList.remove('open');
+                navLinks.classList.remove('mobile-active');
+            }
         });
 
         // ── PANEL STATE ──
@@ -352,6 +558,11 @@
             document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
             document.getElementById('overlay').classList.remove('open');
         }
+
+        // Close panels with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closePanels();
+        });
     </script>
 </body>
 </html>
