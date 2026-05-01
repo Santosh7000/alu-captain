@@ -267,7 +267,7 @@
             <a href="index.html" class="logo">
                 <i class="fas fa-house-chimney-window" style="color: var(--primary-gold);"></i> PropertyHub
             </a>
-            <ul class="nav-links">
+            <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
                 <li><a href="about.html" class="active">About</a></li>
@@ -287,6 +287,11 @@
                     <span class="nav-badge" id="cart-badge">0</span>
                 </button>
                 <a href="listing.html#sell-section" class="btn-gold" style="text-decoration:none; padding: 0.6rem 1.4rem;">List Property</a>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </nav>
 
@@ -362,6 +367,27 @@
         window.addEventListener('scroll', () => {
             document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
         });
+
+        // ── HAMBURGER MENU TOGGLE ──
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        if (hamburger) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('open');
+                navLinks.classList.toggle('mobile-active');
+            });
+        }
+
+        // Close mobile menu when a link is clicked
+        if (navLinks) {
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (hamburger) hamburger.classList.remove('open');
+                    navLinks.classList.remove('mobile-active');
+                });
+            });
+        }
 
         // ── TOAST ──
         function showToast(msg) {
