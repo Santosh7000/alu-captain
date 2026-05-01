@@ -48,6 +48,7 @@
             box-shadow: 0 4px 30px rgba(0,0,0,0.4);
         }
 
+        /* ── LOGO: matches index.html exactly ── */
         .logo {
             text-decoration: none;
             color: #fff;
@@ -234,7 +235,14 @@
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* ── CONTAINER ── */
-        .page-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+        /* ── PAGE WRAPPER: matches index.html background exactly ── */
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(rgba(11, 13, 23, 0.8), rgba(11, 13, 23, 0.95)),
+                        url('future.png') center/cover no-repeat fixed;
+        }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; width: 100%; }
 
         /* ── ANIMATE ── */
@@ -563,13 +571,12 @@
         }
         footer span { color: var(--primary-gold); }
 
-        /* ════════════════════════════════════
+        /* ════════════════════════════════════════════════════════════
            RESPONSIVE BREAKPOINTS
-        ════════════════════════════════════ */
+        ════════════════════════════════════════════════════════════ */
 
         /* Tablet: ≤ 900px */
         @media (max-width: 900px) {
-            /* Mobile nav drawer */
             .hamburger { display: flex; }
             .nav-links {
                 position: fixed;
@@ -599,11 +606,9 @@
         @media (max-width: 700px) {
             .nav-actions .btn-gold { display: none; }
 
-            /* Collapse form grid */
             .form-grid { grid-template-columns: 1fr; }
             .form-group.full { grid-column: span 1; }
 
-            /* Step tabs: show icons only */
             .step-tab { font-size: 0; padding: 14px 8px; }
             .step-tab i { font-size: 1.2rem; margin-bottom: 0; display: block; }
             .step-tab::after {
@@ -644,7 +649,6 @@
 
             .section-panel { padding: 28px 18px; border-radius: 18px; margin: 50px 0; }
 
-            /* Step nav stacks on very small */
             .step-nav { flex-wrap: wrap; }
             .btn-step-back, .btn-step-next { flex: 1; text-align: center; justify-content: center; }
 
@@ -1358,7 +1362,6 @@
             document.getElementById('tab'+currentStep).classList.add('active');
             document.getElementById('progressFill').style.width = (n / totalSteps * 100) + '%';
             restoreFormData(currentStep);
-            // Scroll to form on mobile
             document.getElementById('sell-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
