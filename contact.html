@@ -19,11 +19,13 @@
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
+
         body {
-            background: var(--bg);
+            background-color: var(--bg);
             color: #fff;
             font-family: 'Segoe UI', system-ui, sans-serif;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
         /* ── NAVBAR ── */
@@ -48,15 +50,15 @@
             box-shadow: 0 4px 30px rgba(0,0,0,0.4);
         }
 
+        /* ── LOGO — matches style.css exactly ── */
         .logo {
             text-decoration: none;
             color: #fff;
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            font-size: 1.5rem;
+            font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex-shrink: 0;
             z-index: 1001;
         }
@@ -238,7 +240,13 @@
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* ── PAGE WRAPPER & CONTAINER ── */
-        .page-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(rgba(11, 13, 23, 0.8), rgba(11, 13, 23, 0.95)),
+                        url('future.png') center/cover no-repeat fixed;
+        }
         .container { max-width: 1100px; margin: 0 auto; padding: 0 5%; width: 100%; }
 
         /* ── CONTACT HERO ── */
@@ -457,10 +465,6 @@
                 white-space: normal;
                 text-align: center;
                 bottom: 18px;
-                left: 16px;
-                right: 16px;
-                transform: translateY(20px);
-                /* override the translateX(-50%) for full-width layout */
                 position: fixed;
                 left: 50%;
                 transform: translateX(-50%) translateY(20px);
@@ -526,6 +530,7 @@
     <div class="page-wrapper">
         <!-- NAVBAR -->
         <nav id="mainNav">
+            <!-- Logo matches index.html exactly: icon + "PropertyHub" at 1.1rem bold -->
             <a href="index.html" class="logo">
                 <i class="fas fa-house-chimney-window" style="color:var(--primary-gold);"></i> PropertyHub
             </a>
@@ -672,7 +677,13 @@
             }
         });
         // Escape key closes everything
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePanels(); hamburger.classList.remove('open'); navLinks.classList.remove('mobile-active'); } });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closePanels();
+                hamburger.classList.remove('open');
+                navLinks.classList.remove('mobile-active');
+            }
+        });
 
         // ── TOAST ──
         function showToast(msg) {
